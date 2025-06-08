@@ -6,10 +6,15 @@ export const useTypingEffect = (text: string, speed: number = 30, delay: number 
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    if (!text) {
+    // Reset states when text changes
+    setDisplayedText('');
+    setIsComplete(false);
+    setCurrentIndex(0);
+
+    // Safety check for text
+    if (!text || typeof text !== 'string') {
       setDisplayedText('');
-      setIsComplete(false);
-      setCurrentIndex(0);
+      setIsComplete(true);
       return;
     }
 
@@ -22,7 +27,8 @@ export const useTypingEffect = (text: string, speed: number = 30, delay: number 
             return prevIndex;
           }
           
-          setDisplayedText(text.substring(0, prevIndex + 1));
+          const newText = text.substring(0, prevIndex + 1);
+          setDisplayedText(newText);
           return prevIndex + 1;
         });
       }, speed);

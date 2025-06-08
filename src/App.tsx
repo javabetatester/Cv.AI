@@ -41,9 +41,83 @@ function App() {
 
   const handleProcessingComplete = async () => {
     if (uploadedFile) {
-      const optimizedCV = await AIService.optimizeCV(uploadedFile.file, jobDescription);
-      setCvData(optimizedCV);
-      setCurrentStep('result');
+      try {
+        console.log('🚀 Iniciando otimização do CV...');
+        const optimizedCV = await AIService.optimizeCV(uploadedFile.file, jobDescription);
+        setCvData(optimizedCV);
+        setCurrentStep('result');
+        console.log('✅ CV otimizado com sucesso!');
+      } catch (error) {
+        console.error('❌ Erro no processamento:', error);
+        
+        // Em caso de erro, ainda assim prossegue com dados de demonstração
+        // O AIService já retorna dados fallback automaticamente
+        alert('Não foi possível conectar com os serviços de IA, mas geramos um exemplo otimizado para demonstração.');
+        
+        // Força uso dos dados de demonstração
+        const fallbackData: CVData = {
+          name: "PROFISSIONAL DEMONSTRAÇÃO",
+          position: "Especialista na Área Alvo",
+          area: "Área Profissional Relevante",
+          email: "exemplo@email.com",
+          phone: "(11) 99999-9999",
+          linkedin: "linkedin.com/in/perfil-exemplo",
+          location: "São Paulo, SP",
+          summary: "Profissional qualificado com experiência relevante para a vaga descrita. Este é um exemplo de como seu currículo seria otimizado por nossa IA após análise da descrição da vaga fornecida.",
+          skills: {
+            programming: ["Competência Técnica 1", "Competência Técnica 2", "Competência Técnica 3"],
+            frameworks: ["Ferramenta 1", "Ferramenta 2", "Software Específico"],
+            databases: ["Sistema 1", "Sistema 2"],
+            tools: ["Ferramenta A", "Ferramenta B", "Ferramenta C"],
+            methodologies: ["Metodologia 1", "Metodologia 2", "Framework Ágil"],
+            languages: ["Português (nativo)", "Inglês (fluente)"]
+          },
+          experience: [
+            {
+              company: "Empresa de Demonstração",
+              position: "Cargo Relevante",
+              period: "Jan/2020 - Atual",
+              location: "São Paulo, SP",
+              achievements: [
+                "Conquista quantificada relevante para a vaga com impacto mensurável",
+                "Responsabilidade que demonstra expertise na área de interesse",
+                "Projeto que resultou em melhoria significativa de processos"
+              ]
+            }
+          ],
+          education: [
+            {
+              institution: "INSTITUIÇÃO DE ENSINO",
+              degree: "Graduação",
+              course: "Curso Relevante",
+              year: "2020",
+              location: "São Paulo, SP",
+              projects: ["Projeto Acadêmico Relevante"]
+            }
+          ],
+          certifications: [
+            {
+              name: "Certificação Relevante",
+              institution: "Instituição Certificadora",
+              year: "2023"
+            }
+          ],
+          projects: [
+            {
+              name: "Projeto de Demonstração",
+              technologies: ["Tecnologia 1", "Tecnologia 2"],
+              description: "Projeto que demonstra competências relevantes para a vaga",
+              achievements: ["Resultado quantificado do projeto"]
+            }
+          ],
+          achievements: ["Reconhecimento profissional relevante"],
+          activities: ["Atividade complementar da área"],
+          keywords: ["palavra-chave-1", "palavra-chave-2", "competência-relevante"]
+        };
+        
+        setCvData(fallbackData);
+        setCurrentStep('result');
+      }
     }
   };
 

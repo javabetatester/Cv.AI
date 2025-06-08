@@ -8,18 +8,25 @@ interface CVSectionProps {
   onDownload: () => void;
 }
 
-const TypingText: React.FC<{ text: string; delay?: number; speed?: number; className?: string }> = ({ 
+const TypingText: React.FC<{ 
+  text: string; 
+  delay?: number; 
+  speed?: number; 
+  className?: string 
+}> = ({ 
   text, 
   delay = 0, 
   speed = 30, 
   className = '' 
 }) => {
-  const { displayedText } = useTypingEffect(text, speed, delay);
+  // Verificação de segurança para evitar erros
+  const safeText = text || '';
+  const { displayedText } = useTypingEffect(safeText, speed, delay);
   
   return (
     <span className={className}>
       {displayedText}
-      {displayedText.length < text.length && (
+      {displayedText.length < safeText.length && (
         <span className="animate-pulse text-purple-500">|</span>
       )}
     </span>
@@ -27,6 +34,33 @@ const TypingText: React.FC<{ text: string; delay?: number; speed?: number; class
 };
 
 export const CVSection: React.FC<CVSectionProps> = ({ cvData, onDownload }) => {
+  // Verificações de segurança para todos os dados
+  const safeData = {
+    name: cvData?.name || 'Nome não disponível',
+    position: cvData?.position || 'Posição',
+    area: cvData?.area || 'Área',
+    email: cvData?.email || 'email@exemplo.com',
+    phone: cvData?.phone || '(00) 0000-0000',
+    linkedin: cvData?.linkedin || 'linkedin.com/in/perfil',
+    location: cvData?.location || 'Localização',
+    summary: cvData?.summary || 'Resumo profissional',
+    skills: cvData?.skills || {
+      programming: [],
+      frameworks: [],
+      databases: [],
+      tools: [],
+      methodologies: [],
+      languages: []
+    },
+    experience: cvData?.experience || [],
+    education: cvData?.education || [],
+    certifications: cvData?.certifications || [],
+    projects: cvData?.projects || [],
+    achievements: cvData?.achievements || [],
+    activities: cvData?.activities || [],
+    keywords: cvData?.keywords || []
+  };
+
   return (
     <div className="w-full max-w-5xl mx-auto">
       <div className="text-center mb-8">
@@ -50,28 +84,28 @@ export const CVSection: React.FC<CVSectionProps> = ({ cvData, onDownload }) => {
         {/* Header */}
         <div className="text-center border-b-2 border-purple-200 dark:border-purple-700 pb-6 mb-8">
           <h1 className="text-2xl font-bold mb-2">
-            <TypingText text={cvData.name} speed={50} />
+            <TypingText text={safeData.name} speed={50} />
           </h1>
           <p className="text-lg text-gray-600 dark:text-purple-300 mb-4">
-            <TypingText text={`${cvData.position} | ${cvData.area}`} delay={1000} speed={40} />
+            <TypingText text={`${safeData.position} | ${safeData.area}`} delay={1000} speed={40} />
           </p>
           
           <div className="flex flex-wrap justify-center gap-4 text-sm">
             <div className="flex items-center">
               <Mail className="w-4 h-4 mr-2 text-purple-500" />
-              <TypingText text={cvData.email} delay={2000} speed={25} />
+              <TypingText text={safeData.email} delay={2000} speed={25} />
             </div>
             <div className="flex items-center">
               <Phone className="w-4 h-4 mr-2 text-purple-500" />
-              <TypingText text={cvData.phone} delay={2500} speed={25} />
+              <TypingText text={safeData.phone} delay={2500} speed={25} />
             </div>
             <div className="flex items-center">
               <Linkedin className="w-4 h-4 mr-2 text-purple-600" />
-              <TypingText text={cvData.linkedin} delay={3000} speed={20} />
+              <TypingText text={safeData.linkedin} delay={3000} speed={20} />
             </div>
             <div className="flex items-center">
               <MapPin className="w-4 h-4 mr-2 text-purple-500" />
-              <TypingText text={cvData.location} delay={3500} speed={25} />
+              <TypingText text={safeData.location} delay={3500} speed={25} />
             </div>
           </div>
         </div>
@@ -82,7 +116,7 @@ export const CVSection: React.FC<CVSectionProps> = ({ cvData, onDownload }) => {
             <TypingText text="RESUMO PROFISSIONAL" delay={4000} speed={60} />
           </h3>
           <p className="text-gray-700 dark:text-purple-200 leading-relaxed">
-            <TypingText text={cvData.summary} delay={5000} speed={15} />
+            <TypingText text={safeData.summary} delay={5000} speed={15} />
           </p>
         </section>
 
@@ -92,30 +126,42 @@ export const CVSection: React.FC<CVSectionProps> = ({ cvData, onDownload }) => {
             <TypingText text="COMPETÊNCIAS TÉCNICAS" delay={8000} speed={60} />
           </h3>
           <div className="space-y-2 text-gray-700 dark:text-purple-200">
-            <p>
-              <span className="font-semibold">Linguagens de Programação: </span>
-              <TypingText text={cvData.skills.programming.join(', ')} delay={9000} speed={20} />
-            </p>
-            <p>
-              <span className="font-semibold">Frameworks: </span>
-              <TypingText text={cvData.skills.frameworks.join(', ')} delay={10000} speed={20} />
-            </p>
-            <p>
-              <span className="font-semibold">Bancos de Dados: </span>
-              <TypingText text={cvData.skills.databases.join(', ')} delay={11000} speed={20} />
-            </p>
-            <p>
-              <span className="font-semibold">Ferramentas: </span>
-              <TypingText text={cvData.skills.tools.join(', ')} delay={12000} speed={20} />
-            </p>
-            <p>
-              <span className="font-semibold">Metodologias: </span>
-              <TypingText text={cvData.skills.methodologies.join(', ')} delay={13000} speed={20} />
-            </p>
-            <p>
-              <span className="font-semibold">Idiomas: </span>
-              <TypingText text={cvData.skills.languages.join(', ')} delay={14000} speed={20} />
-            </p>
+            {safeData.skills.programming.length > 0 && (
+              <p>
+                <span className="font-semibold">Linguagens de Programação: </span>
+                <TypingText text={safeData.skills.programming.join(', ')} delay={9000} speed={20} />
+              </p>
+            )}
+            {safeData.skills.frameworks.length > 0 && (
+              <p>
+                <span className="font-semibold">Frameworks: </span>
+                <TypingText text={safeData.skills.frameworks.join(', ')} delay={10000} speed={20} />
+              </p>
+            )}
+            {safeData.skills.databases.length > 0 && (
+              <p>
+                <span className="font-semibold">Bancos de Dados: </span>
+                <TypingText text={safeData.skills.databases.join(', ')} delay={11000} speed={20} />
+              </p>
+            )}
+            {safeData.skills.tools.length > 0 && (
+              <p>
+                <span className="font-semibold">Ferramentas: </span>
+                <TypingText text={safeData.skills.tools.join(', ')} delay={12000} speed={20} />
+              </p>
+            )}
+            {safeData.skills.methodologies.length > 0 && (
+              <p>
+                <span className="font-semibold">Metodologias: </span>
+                <TypingText text={safeData.skills.methodologies.join(', ')} delay={13000} speed={20} />
+              </p>
+            )}
+            {safeData.skills.languages.length > 0 && (
+              <p>
+                <span className="font-semibold">Idiomas: </span>
+                <TypingText text={safeData.skills.languages.join(', ')} delay={14000} speed={20} />
+              </p>
+            )}
           </div>
         </section>
 
@@ -124,27 +170,29 @@ export const CVSection: React.FC<CVSectionProps> = ({ cvData, onDownload }) => {
           <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 border-b border-purple-300 dark:border-purple-600 pb-2">
             <TypingText text="EXPERIÊNCIA PROFISSIONAL" delay={15000} speed={60} />
           </h3>
-          {cvData.experience.map((exp, index) => (
+          {safeData.experience.map((exp, index) => (
             <div key={index} className="mb-6">
               <div className="mb-2">
                 <h4 className="font-bold text-gray-800 dark:text-white">
-                  <TypingText text={`${exp.company} | ${exp.position}`} delay={16000 + index * 2000} speed={30} />
+                  <TypingText text={`${exp.company || 'Empresa'} | ${exp.position || 'Cargo'}`} delay={16000 + index * 2000} speed={30} />
                 </h4>
                 <p className="text-gray-600 dark:text-purple-300 text-sm">
-                  <TypingText text={`${exp.period} | ${exp.location}`} delay={16500 + index * 2000} speed={25} />
+                  <TypingText text={`${exp.period || 'Período'} | ${exp.location || 'Local'}`} delay={16500 + index * 2000} speed={25} />
                 </p>
               </div>
-              <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-purple-200 ml-4">
-                {exp.achievements.map((achievement, achIndex) => (
-                  <li key={achIndex}>
-                    <TypingText 
-                      text={achievement} 
-                      delay={17000 + index * 2000 + achIndex * 1000} 
-                      speed={15} 
-                    />
-                  </li>
-                ))}
-              </ul>
+              {exp.achievements && exp.achievements.length > 0 && (
+                <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-purple-200 ml-4">
+                  {exp.achievements.map((achievement, achIndex) => (
+                    <li key={achIndex}>
+                      <TypingText 
+                        text={achievement || 'Conquista'} 
+                        delay={17000 + index * 2000 + achIndex * 1000} 
+                        speed={15} 
+                      />
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           ))}
         </section>
@@ -154,51 +202,57 @@ export const CVSection: React.FC<CVSectionProps> = ({ cvData, onDownload }) => {
           <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 border-b border-purple-300 dark:border-purple-600 pb-2">
             <TypingText text="FORMAÇÃO ACADÊMICA" delay={22000} speed={60} />
           </h3>
-          {cvData.education.map((edu, index) => (
+          {safeData.education.map((edu, index) => (
             <div key={index} className="mb-4">
               <h4 className="font-bold text-gray-800 dark:text-white">
-                <TypingText text={edu.institution} delay={23000 + index * 1000} speed={30} />
+                <TypingText text={edu.institution || 'Instituição'} delay={23000 + index * 1000} speed={30} />
               </h4>
               <p className="text-gray-600 dark:text-purple-300">
-                <TypingText text={`${edu.degree} em ${edu.course} | ${edu.year}`} delay={23500 + index * 1000} speed={25} />
+                <TypingText text={`${edu.degree || 'Grau'} em ${edu.course || 'Curso'} | ${edu.year || 'Ano'}`} delay={23500 + index * 1000} speed={25} />
               </p>
               <p className="text-gray-600 dark:text-purple-300 text-sm">
-                <TypingText text={edu.location} delay={24000 + index * 1000} speed={25} />
+                <TypingText text={edu.location || 'Local'} delay={24000 + index * 1000} speed={25} />
               </p>
             </div>
           ))}
         </section>
 
         {/* Projects */}
-        <section className="mb-8">
-          <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 border-b border-purple-300 dark:border-purple-600 pb-2">
-            <TypingText text="PROJETOS DESTACADOS" delay={25000} speed={60} />
-          </h3>
-          {cvData.projects.slice(0, 2).map((project, index) => (
-            <div key={index} className="mb-4">
-              <h4 className="font-bold text-gray-800 dark:text-white">
-                <TypingText text={project.name} delay={26000 + index * 1500} speed={30} />
-              </h4>
-              <p className="text-sm font-semibold text-purple-600 dark:text-purple-400 mb-2">
-                <span>Tecnologias: </span>
-                <TypingText text={project.technologies.join(', ')} delay={26500 + index * 1500} speed={20} />
-              </p>
-              <p className="text-gray-700 dark:text-purple-200 text-sm">
-                <TypingText text={project.description} delay={27000 + index * 1500} speed={15} />
-              </p>
-            </div>
-          ))}
-        </section>
+        {safeData.projects.length > 0 && (
+          <section className="mb-8">
+            <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 border-b border-purple-300 dark:border-purple-600 pb-2">
+              <TypingText text="PROJETOS DESTACADOS" delay={25000} speed={60} />
+            </h3>
+            {safeData.projects.slice(0, 2).map((project, index) => (
+              <div key={index} className="mb-4">
+                <h4 className="font-bold text-gray-800 dark:text-white">
+                  <TypingText text={project.name || 'Projeto'} delay={26000 + index * 1500} speed={30} />
+                </h4>
+                {project.technologies && project.technologies.length > 0 && (
+                  <p className="text-sm font-semibold text-purple-600 dark:text-purple-400 mb-2">
+                    <span>Tecnologias: </span>
+                    <TypingText text={project.technologies.join(', ')} delay={26500 + index * 1500} speed={20} />
+                  </p>
+                )}
+                <p className="text-gray-700 dark:text-purple-200 text-sm">
+                  <TypingText text={project.description || 'Descrição do projeto'} delay={27000 + index * 1500} speed={15} />
+                </p>
+              </div>
+            ))}
+          </section>
+        )}
 
         {/* Keywords */}
-        <section>
-          <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 border-b border-purple-300 dark:border-purple-600 pb-2">
-            <TypingText text="PALAVRAS-CHAVE RELEVANTES PARA ATS:" delay={30000} speed={60} />
-          </h3>
-          <p className="text-gray-600 dark:text-purple-300 text-sm">
-            <TypingText text={cvData.keywords.join(', ')} delay={31000} speed={10} />
-          </p>
-        </section>
+        {safeData.keywords.length > 0 && (
+          <section>
+            <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4 border-b border-purple-300 dark:border-purple-600 pb-2">
+              <TypingText text="PALAVRAS-CHAVE RELEVANTES PARA ATS:" delay={30000} speed={60} />
+            </h3>
+            <p className="text-gray-600 dark:text-purple-300 text-sm">
+              <TypingText text={safeData.keywords.join(', ')} delay={31000} speed={10} />
+            </p>
+          </section>
+        )}
       </div>
     </div>
   );
