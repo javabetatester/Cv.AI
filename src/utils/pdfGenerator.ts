@@ -51,10 +51,10 @@ export class PDFGenerator {
     
     // Contact info
     const contactInfo = [
-      `📧 ${cvData.email}`,
-      `📱 ${cvData.phone}`,
-      `🌐 LinkedIn: ${cvData.linkedin}`,
-      `📍 ${cvData.location}`
+      `Email: ${cvData.email}`,
+      `Telefone: ${cvData.phone}`,
+      `LinkedIn: ${cvData.linkedin}`,
+      `Localização: ${cvData.location}`
     ].join(' | ');
     addText(contactInfo, 9, false, '#6B7280');
     

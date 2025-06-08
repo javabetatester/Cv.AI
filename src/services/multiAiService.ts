@@ -22,8 +22,8 @@ export class MultiAIService {
       transform: (messages) => ({
         inputs: messages[messages.length - 1].content,
         parameters: {
-          max_length: 2000,
-          temperature: 0.3,
+          max_length: 5000,
+          temperature: 0.1,
           do_sample: true
         }
       }),
@@ -87,15 +87,15 @@ export class MultiAIService {
   }
 
   private static async callProvider(
-    provider: APIProvider, 
-    messages: any[], 
+    provider: APIProvider,
+    messages: any[],
     retryCount = 0
   ): Promise<string> {
     const maxRetries = 2;
-    
+
     try {
       console.log(`Tentando ${provider.name}...`);
-      
+
       const response = await fetch(provider.endpoint, {
         method: 'POST',
         headers: provider.headers,
@@ -108,21 +108,21 @@ export class MultiAIService {
           await this.delay(5000);
           return this.callProvider(provider, messages, retryCount + 1);
         }
-        
+
         const errorText = await response.text();
         throw new Error(`${provider.name} Error ${response.status}: ${errorText}`);
       }
 
       const data = await response.json();
       const result = provider.parseResponse(data);
-      
+
       if (!result || result.trim().length === 0) {
         throw new Error(`${provider.name}: Resposta vazia`);
       }
-      
+
       console.log(`✅ Sucesso com ${provider.name}`);
       return result;
-      
+
     } catch (error) {
       console.error(`❌ Erro em ${provider.name}:`, error);
       throw error;
@@ -130,109 +130,114 @@ export class MultiAIService {
   }
 
   public static async optimizeCV(
-    cvText: string, 
+    cvText: string,
     jobDescription: string
   ): Promise<CVData> {
     const messages = [
       {
         role: 'system',
-        content: `Você é um ESPECIALISTA MUNDIAL em RH e Recrutamento com 20+ anos de experiência.
+        content: `Você é um especialista sênior em Recrutamento & Seleção e Headhunter, com mais de 20 anos de experiência em otimização de currículos para sistemas ATS e para análise de recrutadores.
 
-EXPERTISE ESPECÍFICA:
-- Estratégias para passar por sistemas ATS (Applicant Tracking Systems)
-- Otimização de currículos para maximizar taxa de aprovação
-- Conhecimento profundo de como recrutadores analisam CVs
-- Expertise em matching de perfis com descrições de vagas
+**REGRAS FUNDAMENTAIS:**
+1.  **FIDELIDADE AO HISTÓRICO**: Manter 100% das experiências profissionais, mantendo datas, empresas e cargos originais. A cronologia é imutável.
+2.  **ADEQUAÇÃO ESTRATÉGICA**: O objetivo é adaptar e reescrever o conteúdo para que o currículo atual pareça o mais adequado possível para a vaga, destacando as sinergias existentes.
+3.  **ENRIQUECIMENTO, NÃO INVENÇÃO**: Enriqueça as descrições com palavras-chave e termos da vaga. É permitido reinterpretar responsabilidades para alinhar com a vaga, mas é proibido fabricar experiências ou competências que o candidato não possui.
+4.  **RELEVÂNCIA PRIMEIRO**: Reorganize a ordem das seções ou dos itens dentro delas para dar prioridade ao que é mais relevante para a vaga.
+5.  **FOCO NO ATS**: Utilize termos e palavras-chave exatas da descrição da vaga para garantir a máxima compatibilidade com os sistemas de triagem automática.
+6.  **SAÍDA ESTRITAMENTE JSON**: Sua resposta deve ser exclusivamente um objeto JSON válido, sem nenhum texto ou comentário adicional fora do JSON.
 
-REGRAS FUNDAMENTAIS:
-✅ MANTER 100% das experiências profissionais existentes
-✅ MANTER todos os dados pessoais, datas, empresas, cargos
-✅ ADAPTAR estrategicamente títulos para atrair recrutadores
-✅ ENRIQUECER descrições com palavras-chave ATS
-✅ INVENTAR detalhes específicos que conectem com a vaga (SE NECESSÁRIO)
-✅ REORGANIZAR por relevância estratégica
-
-ADAPTAÇÕES ESTRATÉGICAS PERMITIDAS:
-🎯 Título Profissional: Adapte para combinar com a vaga alvo
-🎯 Resumo: Reescreva focando nas competências da vaga
-🎯 Responsabilidades: Enriqueça com palavras-chave específicas
-🎯 Competências: Adicione tecnologias/habilidades relevantes
-🎯 Conquistas: Quantifique e conecte com resultados esperados
-
-NUNCA FAÇA:
-❌ Remover experiências profissionais
-❌ Alterar datas ou empresas
-❌ Reduzir número de responsabilidades
-
-RESPONDA APENAS COM JSON VÁLIDO.`
+**ADAPTAÇÕES PERMITIDAS:**
+* **Título Profissional**: Modifique o título principal para espelhar o cargo da vaga (ex: "Analista de Dados" vira "Cientista de Dados" se a vaga for para essa posição e as competências forem compatíveis).
+* **Resumo Profissional**: Reescreva completamente o resumo para ser um "pitch" direto para a vaga, conectando as principais experiências do candidato com os requisitos da vaga.
+* **Responsabilidades e Conquistas**: Mantenha a essência de cada tarefa, mas reescreva-as usando a terminologia da vaga, quantificando resultados sempre que possível (ex: "Desenvolvi rotinas de otimização" pode virar "Liderei a otimização de processos de ETL, resultando em uma melhoria de 15% na performance", se for uma inferência razoável).
+* **Competências**: Destaque e adapte a nomenclatura das habilidades que o candidato já possui para que correspondam exatamente aos termos usados na vaga. Não adicione habilidades que não sejam uma extensão lógica do perfil.`,
       },
       {
         role: 'user',
-        content: `MISSÃO RH: Otimize este currículo para MAXIMIZAR chances de aprovação na vaga.
+        content: `**MISSÃO DE RH ESTRATÉGICO:** Analise o currículo e a vaga a seguir. Otimize o currículo para maximizar a compatibilidade com a vaga, tornando-o altamente atrativo para os recrutadores e para os sistemas ATS. A otimização deve ser realista, sem alterar a cronologia e sem inventar experiências.
 
-CURRÍCULO ORIGINAL:
+**CURRÍCULO ORIGINAL:**
+\`\`\`
 ${cvText}
+\`\`\`
 
-VAGA ALVO:
+**VAGA ALVO:**
+\`\`\`
 ${jobDescription}
+\`\`\`
 
-ESTRATÉGIA DE OTIMIZAÇÃO:
-1. ANALISE a vaga e identifique palavras-chave críticas para ATS
-2. ADAPTE o título profissional para alinhar com a vaga
-3. MANTENHA todas experiências mas ENRIQUEÇA com palavras-chave
-4. ADICIONE competências técnicas específicas da vaga
-5. REESCREVA o resumo profissional focando na vaga
-6. REORGANIZE experiências colocando as mais relevantes primeiro
-7. INVENTE detalhes específicos que conectem com a vaga (se necessário)
+**INSTRUÇÕES DE OTIMIZAÇÃO:**
+1.  **ANÁLISE DA VAGA**: Identifique as competências, tecnologias, responsabilidades e palavras-chave mais críticas para o ATS.
+2.  **ADAPTAÇÃO DE TÍTULO E RESUMO**: Alinhe o título profissional e reescreva o resumo para espelhar diretamente os requisitos da vaga.
+3.  **REFORMULAÇÃO DA EXPERIÊNCIA**: Mantenha todas as experiências, mas reescreva as responsabilidades e conquistas de cada uma para destacar a relevância para a vaga, utilizando as palavras-chave identificadas.
+4.  **ADEQUAÇÃO DE COMPETÊNCIAS**: Reestruture a seção de habilidades para priorizar as que são mencionadas na vaga. Use os mesmos termos da descrição da vaga para nomear as competências que o candidato já possui.
+5.  **EXTRAÇÃO DE PALAVRAS-CHAVE**: Crie uma lista de palavras-chave extraídas diretamente da descrição da vaga para incluir no final do JSON.
 
-FORMATO JSON OBRIGATÓRIO:
+**FORMATO DE SAÍDA (OBRIGATÓRIO - APENAS JSON):**
+Gere um objeto JSON contendo a estrutura de dados completa do currículo otimizado, conforme o exemplo abaixo:
+\`\`\`json
 {
-  "name": "NOME REAL DO CANDIDATO",
-  "position": "Título adaptado estrategicamente para a vaga (ex: se vaga é 'Desenvolvedor Python Senior', use 'Desenvolvedor Python Senior')",
-  "area": "Área específica da vaga",
-  "email": "EMAIL REAL",
-  "phone": "TELEFONE REAL", 
-  "linkedin": "LINKEDIN REAL",
-  "location": "LOCALIZAÇÃO REAL",
-  "summary": "Resumo reescrito focando especificamente nas competências da vaga, mencionando tecnologias exatas da descrição, anos de experiência relevantes, e resultados que o candidato pode entregar",
+  "name": "NOME COMPLETO DO CANDIDATO",
+  "position": "Título do cargo adaptado para a vaga",
+  "area": "Área de atuação da vaga",
+  "email": "email.real@exemplo.com",
+  "phone": "Telefone real",
+  "linkedin": "URL do LinkedIn real",
+  "location": "Localização real",
+  "summary": "Resumo profissional totalmente reescrito e focado na vaga.",
   "skills": {
-    "programming": ["TODAS linguagens reais + linguagens da vaga"],
-    "frameworks": ["TODOS frameworks reais + frameworks da vaga"],
-    "databases": ["TODOS bancos reais + bancos da vaga"],
-    "tools": ["TODAS ferramentas reais + ferramentas específicas da vaga"],
-    "methodologies": ["TODAS metodologias reais + metodologias da vaga"],
-    "languages": ["TODOS idiomas reais"]
+    "programming": ["Linguagens existentes adaptadas e priorizadas pela vaga"],
+    "frameworks": ["Frameworks existentes adaptados e priorizados pela vaga"],
+    "databases": ["Bancos de dados existentes adaptados e priorizados pela vaga"],
+    "tools": ["Ferramentas existentes adaptadas e priorizadas pela vaga"],
+    "methodologies": ["Metodologias existentes adaptadas e priorizadas pela vaga"],
+    "languages": ["Idiomas que o candidato fala"]
   },
   "experience": [
-    "MANTENHA TODAS experiências mas REORGANIZE por relevância e ENRIQUEÇA:",
     {
-      "company": "EMPRESA REAL",
-      "position": "CARGO REAL (pode adaptar levemente para alinhar com vaga)",
-      "period": "PERÍODO REAL EXATO",
-      "location": "LOCALIZAÇÃO REAL",
+      "company": "Nome da Empresa Original",
+      "position": "Cargo Original (pode ser levemente ajustado)",
+      "period": "Período Original (imutável)",
+      "location": "Localização Original",
       "achievements": [
-        "TODAS responsabilidades reais MAS enriquecidas com palavras-chave da vaga",
-        "Projetos reais descritos usando terminologia específica da vaga",
-        "Resultados quantificados que demonstrem competências da vaga",
-        "ADICIONE detalhes técnicos específicos da vaga se necessário",
-        "Conquistas que mostrem domínio das tecnologias da vaga"
+        "Responsabilidade 1 reescrita com foco na vaga.",
+        "Conquista 2 quantificada e alinhada com os objetivos da vaga.",
+        "Tecnologia X (da vaga) aplicada em projeto Y (real do candidato)."
       ]
     }
   ],
   "education": [
-    "MANTENHA TODA educação real mas adapte projetos para serem relevantes"
+    {
+      "institution": "Instituição de Ensino Original",
+      "degree": "Grau Original",
+      "course": "Curso Original",
+      "year": "Ano de Conclusão Original",
+      "location": "Localização Original",
+      "projects": ["Projetos acadêmicos relevantes, se houver"]
+    }
   ],
   "certifications": [
-    "MANTENHA todas certificações reais + ADICIONE certificações relevantes se o candidato provavelmente as teria"
+    {
+      "name": "Nome da Certificação Original",
+      "institution": "Instituição da Certificação Original",
+      "year": "Ano Original"
+    }
   ],
   "projects": [
-    "MANTENHA todos projetos reais mas adapte descrições para usar tecnologias da vaga"
+    {
+      "name": "Nome do Projeto Original",
+      "technologies": ["Tecnologias originais, com nomenclatura alinhada à vaga"],
+      "description": "Descrição original, reescrita para destacar relevância.",
+      "achievements": ["Conquistas originais, reescritas para a vaga."]
+    }
   ],
-  "achievements": ["TODAS conquistas reais + conquistas relevantes para a vaga"],
-  "activities": ["TODAS atividades reais + atividades que demonstrem interesse na área da vaga"],
-  "keywords": ["TODAS palavras-chave EXATAS extraídas da vaga"]
-}`
-      }
+  "achievements": ["Conquistas e premiações gerais relevantes."],
+  "activities": ["Atividades complementares relevantes."],
+  "keywords": ["Lista de palavras-chave exatas e importantes extraídas da vaga para ATS."]
+}
+\`\`\`
+`,
+      },
     ];
 
     let lastError: Error | null = null;
@@ -248,12 +253,12 @@ FORMATO JSON OBRIGATÓRIO:
         }
 
         const response = await this.callProvider(provider, messages);
-        
+
         // Tenta fazer parse do JSON
         try {
           const cleanResponse = this.cleanJsonResponse(response);
           const cvData: CVData = JSON.parse(cleanResponse);
-          
+
           // Validação básica
           if (this.validateCVData(cvData)) {
             console.log(`🎉 CV otimizado com sucesso usando ${provider.name}`);
@@ -261,13 +266,13 @@ FORMATO JSON OBRIGATÓRIO:
           } else {
             throw new Error('Dados do CV incompletos após validação');
           }
-          
+
         } catch (parseError) {
           console.error(`Erro ao fazer parse da resposta de ${provider.name}:`, parseError);
           lastError = parseError as Error;
           continue;
         }
-        
+
       } catch (error) {
         console.error(`Falha em ${provider.name}:`, error);
         lastError = error as Error;
@@ -296,15 +301,15 @@ FORMATO JSON OBRIGATÓRIO:
   private static cleanJsonResponse(response: string): string {
     // Remove possíveis caracteres extras e foca no JSON
     let cleaned = response.trim();
-    
+
     // Procura pelo início e fim do JSON
     const startIndex = cleaned.indexOf('{');
     const lastBraceIndex = cleaned.lastIndexOf('}');
-    
+
     if (startIndex !== -1 && lastBraceIndex !== -1 && lastBraceIndex > startIndex) {
       cleaned = cleaned.substring(startIndex, lastBraceIndex + 1);
     }
-    
+
     return cleaned;
   }
 
