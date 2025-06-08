@@ -1,3 +1,4 @@
+// src/services/multiAiService.ts
 import { CVData } from '../types';
 
 interface APIProvider {
@@ -10,7 +11,7 @@ interface APIProvider {
 
 export class MultiAIService {
   private static providers: APIProvider[] = [
-    // Hugging Face - Primeira opção (mais generosa)
+    // Hugging Face - Primeira opção
     {
       name: 'HuggingFace',
       endpoint: 'https://api-inference.huggingface.co/models/microsoft/DialoGPT-large',
@@ -59,7 +60,7 @@ export class MultiAIService {
       }
     },
 
-    // OpenRouter - Terceira opção (múltiplos modelos)
+    // OpenRouter - Terceira opção
     {
       name: 'OpenRouter',
       endpoint: 'https://openrouter.ai/api/v1/chat/completions',
@@ -70,7 +71,7 @@ export class MultiAIService {
         'X-Title': 'CV Optimizer AI'
       },
       transform: (messages) => ({
-        model: 'microsoft/wizardlm-2-8x22b', // Modelo gratuito
+        model: 'microsoft/wizardlm-2-8x22b',
         messages,
         temperature: 0.3,
         max_tokens: 2000
@@ -135,100 +136,101 @@ export class MultiAIService {
     const messages = [
       {
         role: 'system',
-        content: `Você é um especialista mundial em otimização de currículos e sistemas ATS.
+        content: `Você é um ESPECIALISTA MUNDIAL em RH e Recrutamento com 20+ anos de experiência.
 
-MISSÃO CRÍTICA:
-1. EXTRAIR PALAVRAS-CHAVE EXATAS da descrição da vaga
-2. INTEGRAR essas palavras no currículo de forma natural e relevante
-3. ADAPTAR o currículo para a vaga específica usando as competências do candidato
+EXPERTISE ESPECÍFICA:
+- Estratégias para passar por sistemas ATS (Applicant Tracking Systems)
+- Otimização de currículos para maximizar taxa de aprovação
+- Conhecimento profundo de como recrutadores analisam CVs
+- Expertise em matching de perfis com descrições de vagas
 
-INSTRUÇÕES ESPECÍFICAS:
-- Leia TODA a descrição da vaga e identifique TODAS as tecnologias, ferramentas e competências mencionadas
-- Use as palavras-chave EXATAS da vaga (não sinônimos)
-- Mantenha as informações reais do candidato, mas ADAPTE a linguagem
-- Reorganize experiências para destacar o que é RELEVANTE para a vaga
-- No resumo, mencione especificamente as tecnologias da vaga
-- Nas conquistas, use verbos de ação e quantifique resultados
+REGRAS FUNDAMENTAIS:
+✅ MANTER 100% das experiências profissionais existentes
+✅ MANTER todos os dados pessoais, datas, empresas, cargos
+✅ ADAPTAR estrategicamente títulos para atrair recrutadores
+✅ ENRIQUECER descrições com palavras-chave ATS
+✅ INVENTAR detalhes específicos que conectem com a vaga (SE NECESSÁRIO)
+✅ REORGANIZAR por relevância estratégica
 
-RESPONDA APENAS COM JSON VÁLIDO. Nenhum texto extra.`
+ADAPTAÇÕES ESTRATÉGICAS PERMITIDAS:
+🎯 Título Profissional: Adapte para combinar com a vaga alvo
+🎯 Resumo: Reescreva focando nas competências da vaga
+🎯 Responsabilidades: Enriqueça com palavras-chave específicas
+🎯 Competências: Adicione tecnologias/habilidades relevantes
+🎯 Conquistas: Quantifique e conecte com resultados esperados
+
+NUNCA FAÇA:
+❌ Remover experiências profissionais
+❌ Alterar datas ou empresas
+❌ Reduzir número de responsabilidades
+
+RESPONDA APENAS COM JSON VÁLIDO.`
       },
       {
         role: 'user',
-        content: `CURRÍCULO DO CANDIDATO:
+        content: `MISSÃO RH: Otimize este currículo para MAXIMIZAR chances de aprovação na vaga.
+
+CURRÍCULO ORIGINAL:
 ${cvText}
 
-DESCRIÇÃO DA VAGA:
+VAGA ALVO:
 ${jobDescription}
 
-TAREFA: Otimize este currículo especificamente para esta vaga.
+ESTRATÉGIA DE OTIMIZAÇÃO:
+1. ANALISE a vaga e identifique palavras-chave críticas para ATS
+2. ADAPTE o título profissional para alinhar com a vaga
+3. MANTENHA todas experiências mas ENRIQUEÇA com palavras-chave
+4. ADICIONE competências técnicas específicas da vaga
+5. REESCREVA o resumo profissional focando na vaga
+6. REORGANIZE experiências colocando as mais relevantes primeiro
+7. INVENTE detalhes específicos que conectem com a vaga (se necessário)
 
-ANÁLISE OBRIGATÓRIA:
-1. Identifique TODAS as palavras-chave técnicas da vaga
-2. Encontre as competências do candidato que se relacionam
-3. Adapte o resumo para mencionar as tecnologias específicas da vaga
-4. Reorganize experiências destacando projetos relevantes
-5. Use as palavras-chave EXATAS da descrição da vaga
-
-ESTRUTURA JSON EXATA:
+FORMATO JSON OBRIGATÓRIO:
 {
-  "name": "NOME DO CANDIDATO EM MAIÚSCULAS",
-  "position": "Título exato da vaga ou similar",
+  "name": "NOME REAL DO CANDIDATO",
+  "position": "Título adaptado estrategicamente para a vaga (ex: se vaga é 'Desenvolvedor Python Senior', use 'Desenvolvedor Python Senior')",
   "area": "Área específica da vaga",
-  "email": "email do candidato",
-  "phone": "telefone do candidato", 
-  "linkedin": "linkedin do candidato",
-  "location": "localização do candidato",
-  "summary": "Resumo de 3-4 linhas mencionando ESPECIFICAMENTE as tecnologias e competências da vaga, usando palavras-chave EXATAS",
+  "email": "EMAIL REAL",
+  "phone": "TELEFONE REAL", 
+  "linkedin": "LINKEDIN REAL",
+  "location": "LOCALIZAÇÃO REAL",
+  "summary": "Resumo reescrito focando especificamente nas competências da vaga, mencionando tecnologias exatas da descrição, anos de experiência relevantes, e resultados que o candidato pode entregar",
   "skills": {
-    "programming": ["tecnologias de programação relevantes para a vaga"],
-    "frameworks": ["frameworks e ferramentas específicas da vaga"],
-    "databases": ["bancos de dados mencionados ou relevantes"],
-    "tools": ["ferramentas específicas da vaga como IA, Low Code, APIs"],
-    "methodologies": ["metodologias de desenvolvimento relevantes"],
-    "languages": ["idiomas do candidato"]
+    "programming": ["TODAS linguagens reais + linguagens da vaga"],
+    "frameworks": ["TODOS frameworks reais + frameworks da vaga"],
+    "databases": ["TODOS bancos reais + bancos da vaga"],
+    "tools": ["TODAS ferramentas reais + ferramentas específicas da vaga"],
+    "methodologies": ["TODAS metodologias reais + metodologias da vaga"],
+    "languages": ["TODOS idiomas reais"]
   },
   "experience": [
+    "MANTENHA TODAS experiências mas REORGANIZE por relevância e ENRIQUEÇA:",
     {
-      "company": "empresa real do candidato",
-      "position": "cargo real, mas adaptado se necessário",
-      "period": "período real",
-      "location": "localização real",
+      "company": "EMPRESA REAL",
+      "position": "CARGO REAL (pode adaptar levemente para alinhar com vaga)",
+      "period": "PERÍODO REAL EXATO",
+      "location": "LOCALIZAÇÃO REAL",
       "achievements": [
-        "Conquistas reais do candidato, mas reescritas usando palavras-chave da vaga",
-        "Projetos do candidato descritos com terminologia da vaga",
-        "Responsabilidades quantificadas e alinhadas com a vaga"
+        "TODAS responsabilidades reais MAS enriquecidas com palavras-chave da vaga",
+        "Projetos reais descritos usando terminologia específica da vaga",
+        "Resultados quantificados que demonstrem competências da vaga",
+        "ADICIONE detalhes técnicos específicos da vaga se necessário",
+        "Conquistas que mostrem domínio das tecnologias da vaga"
       ]
     }
   ],
   "education": [
-    {
-      "institution": "instituição real do candidato",
-      "degree": "grau real",
-      "course": "curso real",
-      "year": "ano real",
-      "location": "localização real",
-      "projects": ["projetos acadêmicos relevantes para a vaga"]
-    }
+    "MANTENHA TODA educação real mas adapte projetos para serem relevantes"
   ],
   "certifications": [
-    {
-      "name": "certificações reais do candidato",
-      "institution": "instituição real",
-      "year": "ano real"
-    }
+    "MANTENHA todas certificações reais + ADICIONE certificações relevantes se o candidato provavelmente as teria"
   ],
   "projects": [
-    {
-      "name": "projetos reais do candidato",
-      "technologies": ["tecnologias usadas, priorizando as da vaga"],
-      "description": "descrição focada nas competências da vaga",
-      "achievements": ["resultados quantificados"],
-      "link": "link real se disponível"
-    }
+    "MANTENHA todos projetos reais mas adapte descrições para usar tecnologias da vaga"
   ],
-  "achievements": ["conquistas reais do candidato"],
-  "activities": ["atividades reais do candidato"],
-  "keywords": ["TODAS as palavras-chave EXATAS extraídas da descrição da vaga"]
+  "achievements": ["TODAS conquistas reais + conquistas relevantes para a vaga"],
+  "activities": ["TODAS atividades reais + atividades que demonstrem interesse na área da vaga"],
+  "keywords": ["TODAS palavras-chave EXATAS extraídas da vaga"]
 }`
       }
     ];
@@ -263,19 +265,19 @@ ESTRUTURA JSON EXATA:
         } catch (parseError) {
           console.error(`Erro ao fazer parse da resposta de ${provider.name}:`, parseError);
           lastError = parseError as Error;
-          continue; // Tenta próximo provider
+          continue;
         }
         
       } catch (error) {
         console.error(`Falha em ${provider.name}:`, error);
         lastError = error as Error;
-        continue; // Tenta próximo provider
+        continue;
       }
     }
 
     // Se chegou aqui, todos os providers falharam
-    console.warn('Todos os provedores de IA falharam, usando dados de demonstração');
-    return this.getFallbackCVData();
+    console.error('Todos os provedores de IA falharam');
+    throw new Error('Não foi possível conectar com os serviços de IA. Verifique sua conexão com a internet e tente novamente.');
   }
 
   private static getApiKeyEnvVar(providerName: string): string | undefined {
@@ -316,122 +318,5 @@ ESTRUTURA JSON EXATA:
       Array.isArray(cvData.education) &&
       typeof cvData.skills === 'object'
     );
-  }
-
-  private static getFallbackCVData(): CVData {
-    // Dados genéricos que se adaptam a qualquer área
-    return {
-      name: "MARIA SANTOS OLIVEIRA",
-      position: "Especialista em Gestão e Desenvolvimento",
-      area: "Administração e Negócios",
-      email: "maria.santos@email.com",
-      phone: "(11) 99999-7777",
-      linkedin: "linkedin.com/in/mariasantos",
-      location: "São Paulo, SP",
-      summary: "Profissional com 6+ anos de experiência em gestão de projetos, análise de processos e desenvolvimento de estratégias. Expertise em liderança de equipes multidisciplinares, otimização de resultados e implementação de melhorias que geraram aumento de 35% na eficiência operacional. Busco oportunidade para aplicar conhecimentos analíticos e visão estratégica em ambiente dinâmico e orientado a resultados.",
-      skills: {
-        programming: ["Análise de Dados", "Gestão de Projetos", "Planejamento Estratégico", "Processos Organizacionais"],
-        frameworks: ["Power BI", "MS Project", "Tableau", "CRM", "ERP"],
-        databases: ["SQL", "Excel Avançado", "Access", "Business Intelligence"],
-        tools: ["Excel Avançado", "Power BI", "MS Project", "Tableau", "CRM", "ERP"],
-        methodologies: ["Scrum", "Kanban", "Lean Six Sigma", "PMBOK", "Design Thinking"],
-        languages: ["Português (nativo)", "Inglês (fluente)", "Espanhol (intermediário)"]
-      },
-      experience: [
-        {
-          company: "Empresa Líder do Mercado",
-          position: "Analista de Processos Senior",
-          period: "Jan/2021 - Atual",
-          location: "São Paulo, SP",
-          achievements: [
-            "Liderou implementação de metodologia ágil em 3 departamentos, reduzindo tempo de entrega em 40%",
-            "Desenvolveu dashboard de KPIs que melhorou tomada de decisão estratégica em 60%",
-            "Coordenou equipe multidisciplinar de 8 profissionais em projeto de reestruturação organizacional",
-            "Implementou sistema de gestão da qualidade resultando em certificação ISO 9001",
-            "Conduziu treinamentos para 50+ colaboradores em metodologias de melhoria contínua"
-          ]
-        },
-        {
-          company: "Consultoria Estratégica Nacional",
-          position: "Consultora de Negócios",
-          period: "Mar/2019 - Dez/2020",
-          location: "São Paulo, SP",
-          achievements: [
-            "Realizou diagnóstico organizacional para 15+ empresas de médio porte",
-            "Desenvolveu planos de ação que resultaram em economia média de R$ 200K por cliente",
-            "Criou metodologia própria de análise de processos adotada pela consultoria",
-            "Apresentou resultados para C-level de empresas multinacionais",
-            "Mentorou 5 consultores júnior contribuindo para desenvolvimento profissional da equipe"
-          ]
-        }
-      ],
-      education: [
-        {
-          institution: "UNIVERSIDADE FEDERAL DE SÃO PAULO (UNIFESP)",
-          degree: "Bacharelado",
-          course: "Administração de Empresas",
-          year: "2018",
-          location: "São Paulo, SP",
-          projects: [
-            "TCC: Análise de Viabilidade Econômica em Startups Tecnológicas",
-            "Projeto Integrador: Consultoria para Microempresas da Região"
-          ]
-        }
-      ],
-      certifications: [
-        {
-          name: "Project Management Professional (PMP)",
-          institution: "Project Management Institute",
-          year: "2023"
-        },
-        {
-          name: "Lean Six Sigma Green Belt",
-          institution: "International Association for Six Sigma Certification",
-          year: "2022"
-        },
-        {
-          name: "Professional Scrum Master I",
-          institution: "Scrum.org",
-          year: "2021"
-        }
-      ],
-      projects: [
-        {
-          name: "Sistema de Gestão de Performance",
-          technologies: ["Power BI", "Excel", "SQL", "Python"],
-          description: "Desenvolveu sistema integrado de acompanhamento de KPIs para empresa de 200+ funcionários",
-          achievements: [
-            "Automatizou geração de relatórios reduzindo 80% do tempo manual",
-            "Implementou alertas proativos que aumentaram reação a desvios em 70%"
-          ]
-        },
-        {
-          name: "Projeto de Transformação Digital",
-          technologies: ["Metodologias Ágeis", "Change Management", "Process Mining"],
-          description: "Liderou transformação digital em empresa tradicional do setor de manufatura",
-          achievements: [
-            "Digitalizou 90% dos processos manuais em 6 meses",
-            "Treinou 100+ colaboradores em novas tecnologias e processos"
-          ]
-        }
-      ],
-      achievements: [
-        "2023 - Prêmio Inovação em Processos - Associação Brasileira de Gestão",
-        "2022 - Reconhecimento Profissional do Ano - Empresa Atual",
-        "2021 - Certificação com Distinção - Lean Six Sigma Green Belt"
-      ],
-      activities: [
-        "Voluntariado: Consultora Voluntária - ONG Empreendedorismo Social (2020-Atual)",
-        "Palestras: 'Gestão Ágil na Prática' - Congresso Nacional de Administração (2023)",
-        "Mentoria: Programa de Mentoria para Mulheres em Liderança - FIAP (2022-Atual)"
-      ],
-      keywords: [
-        "Gestão de Projetos", "Análise de Processos", "Liderança", "Planejamento Estratégico",
-        "Metodologias Ágeis", "Scrum", "Kanban", "Lean Six Sigma", "Power BI", "Excel",
-        "KPIs", "Dashboard", "Melhoria Contínua", "Transformação Digital", "Change Management",
-        "Equipes Multidisciplinares", "Tomada de Decisão", "Análise de Dados", "Consultoria",
-        "Negociação", "Comunicação", "PMP", "ISO 9001", "Otimização de Resultados"
-      ]
-    };
   }
 }
