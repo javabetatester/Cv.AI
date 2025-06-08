@@ -21,7 +21,7 @@ Transforme seu currículo com o poder da Inteligência Artificial e conquiste a 
 
 O processo é dividido em quatro etapas simples:
 
-1.  **Upload**: Você começa enviando seu currículo em PDF.
+1.  **Upload**: Você começa enviando seu currículo em PDF (PEGUE ELE NO SEU PERFIL DO LINKEDIN).
 2.  **Descrição da Vaga**: Em seguida, você insere a descrição da vaga para a qual deseja se candidatar.
 3.  **Processamento**: Nossa IA entra em ação, analisando ambos os documentos e cruzando as informações para criar a versão otimizada do seu CV.
 4.  **Resultado**: Você visualiza o resultado e pode baixar o novo currículo em PDF, pronto para ser enviado\!
